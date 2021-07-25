@@ -29,6 +29,18 @@ Napi::Value node_read(const Napi::CallbackInfo& info)
 
 }
 
+Napi::Number node_write(const Napi::CallbackInfo& info)
+{
+    // open(path,mode) -> fd
+    Napi::Env env = info.Env();
+    long fd= info[0].As<Napi::Number>().Uint32Value();
+    uint8_t* buf= (uint8_t *) (info[1].As<Napi::ArrayBuffer>().Data());
+    long len = info[0].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,write(fd,buf,len));
+
+}
+
 Napi::Number node_open(const Napi::CallbackInfo& info)
 {
     // open(path,mode) -> fd
