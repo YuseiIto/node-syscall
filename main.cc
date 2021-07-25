@@ -59,6 +59,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
                 Napi::Function::New(env, node_getpid));
     exports.Set(Napi::String::New(env, "read"), 
                 Napi::Function::New(env, node_read));
+    exports.Set(Napi::String::New(env, "write"), 
+                Napi::Function::New(env, node_write));
     exports.Set(Napi::String::New(env, "open"), 
                 Napi::Function::New(env, node_open));
 
