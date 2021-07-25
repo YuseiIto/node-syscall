@@ -146,17 +146,17 @@ Napi::Number node_poll(const Napi::CallbackInfo& info){
     Napi::Env env = info.Env();
 
     Napi::Array node_fds = info[0].As<Napi::Array>();
-    long nfds=info[1].As<Napi::Number>();
-    long timeout=info[2].As<Napi::Number>();
+    long nfds=info[1].As<Napi::Number>().Uint32Value();
+    long timeout=info[2].As<Napi::Number>().Uint32Value();
     
     pollfd* fds=(pollfd*) malloc(sizeof(pollfd)*nfds);
 
     for (long i =0; i<nfds;i++){
         Napi::Object e = node_fds.Get(i).As<Napi::Object>();
         pollfd pfd;
-        pfd.fd=e.Get("fd").As<Napi::Number>();
-        pfd.fd=e.Get("events").As<Napi::Number>();
-        pfd.fd=e.Get("revents").As<Napi::Number>();
+        pfd.fd=e.Get("fd").As<Napi::Number>().Uint32Value();
+        pfd.fd=e.Get("events").As<Napi::Number>().Uint32Value();
+        pfd.fd=e.Get("revents").As<Napi::Number>().Uint32Value();
         fds[i]=pfd;
     }
     return  Napi::Number::New(env,poll(fds,nfds,timeout));
@@ -165,10 +165,18 @@ Napi::Number node_poll(const Napi::CallbackInfo& info){
 Napi::Number node_lseek(const Napi::CallbackInfo& info){
 
     Napi::Env env = info.Env();
-    long fields=info[0].As<Napi::Number>();
-    long offset=info[1].As<Napi::Number>();
-    long whence=info[2].As<Napi::Number>();
+    long fields=info[0].As<Napi::Number>().Uint32Value();
+    long offset=info[1].As<Napi::Number>().Uint32Value();
+    long whence=info[2].As<Napi::Number>().Uint32Value();
     return  Napi::Number::New(env,lseek(fields,offset,whence));
+}
+
+Napi::Number node_brk(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    void* end_data_segment=(void *)info[0].As<Napi::Number>().Uint32Value();
+    
+    return  Napi::Number::New(env,brk(end_data_segment));
 }
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
@@ -193,6 +201,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_poll));
     exports.Set(Napi::String::New(env, "lseek"), 
           Napi::Function::New(env, node_lseek));
+    exports.Set(Napi::String::New(env, "brk"), 
+          Napi::Function::New(env, node_brk));
     
     return exports;
 }
