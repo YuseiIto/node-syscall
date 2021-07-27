@@ -17,6 +17,14 @@ Napi::Number node_getpid(const Napi::CallbackInfo& info)
     return  Napi::Number::New(env, pid);
 }
 
+Napi::Number node_getppid(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+    pid_t pid=getppid();
+    return  Napi::Number::New(env, pid);
+}
+
+
 Napi::Value node_read(const Napi::CallbackInfo& info)
 {
     // read(fd,count) - > size
@@ -338,6 +346,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
                 Napi::Function::New(env, node_getpid));
+    exports.Set(Napi::String::New(env, "getppid"), 
+                Napi::Function::New(env, node_getppid));
     exports.Set(Napi::String::New(env, "read"), 
                 Napi::Function::New(env, node_read));
     exports.Set(Napi::String::New(env, "write"), 
