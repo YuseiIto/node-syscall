@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <poll.h>
+#include <fcntl.h>
 
 namespace node_syscall {
 
@@ -313,11 +314,25 @@ Napi::Number node_dup2(const Napi::CallbackInfo& info){
 
     Napi::Env env = info.Env();
     int oldfd=info[0].As<Napi::Number>().Uint32Value();
-    int newfd=info[0].As<Napi::Number>().Uint32Value();
+    int newfd=info[1].As<Napi::Number>().Uint32Value();
 
     return  Napi::Number::New(env,dup2(oldfd,newfd));
 }
 
+Napi::Number node_fcntl(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int fd=info[0].As<Napi::Number>().Uint32Value();
+    int cmd=info[1].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,fcntl(fd,cmd));
+}
+
+Napi::Number node_fork(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    return  Napi::Number::New(env,fork());
+}
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -369,7 +384,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_dup));
     exports.Set(Napi::String::New(env, "dup2"), 
           Napi::Function::New(env, node_dup2));
-
+    exports.Set(Napi::String::New(env, "fork"), 
+          Napi::Function::New(env, node_fork));
     return exports;
 }
 
