@@ -468,6 +468,15 @@ Napi::Number node_setsid(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,setsid());
 }
 
+
+Napi::Number node_symlink(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* oldpath = info[0].As<Napi::String>().Utf8Value().c_str();
+    const char* newpath = info[1].As<Napi::String>().Utf8Value().c_str();
+
+    return Napi::Number::New(env,symlink(oldpath,newpath));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -544,7 +553,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_rmdir));
     exports.Set(Napi::String::New(env, "setsid"), 
           Napi::Function::New(env, node_setsid));
-          
+    exports.Set(Napi::String::New(env, "symlink"), 
+          Napi::Function::New(env, node_symlink));
+
     return exports;
 }
 
