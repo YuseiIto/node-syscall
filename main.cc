@@ -419,6 +419,15 @@ Napi::Number node_kill(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,kill(pid,sig));
 }
 
+Napi::Number node_link(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+    const char* oldpath = info[0].As<Napi::String>().Utf8Value().c_str();
+    const char* newpath = info[1].As<Napi::String>().Utf8Value().c_str();
+
+    return Napi::Number::New(env,link(oldpath,newpath));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -479,6 +488,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_gettimeofday));
     exports.Set(Napi::String::New(env, "kill"), 
           Napi::Function::New(env, node_kill));
+    exports.Set(Napi::String::New(env, "link"), 
+          Napi::Function::New(env, node_link));
 
     return exports;
 }
