@@ -75,57 +75,46 @@ Napi::Number node_close(const Napi::CallbackInfo& info)
 
 }
 
+Napi::Object statToStatObj(struct stat* stat,Napi::Env *env){
+    
+    Napi::Object obj = Napi::Object::New(*env);
+    obj.Set("st_dev",Napi::Number::New(*env,stat->st_dev));
+    obj.Set("st_ino",Napi::Number::New(*env,stat->st_ino));
+    obj.Set("st_mode",Napi::Number::New(*env,stat->st_mode));
+    obj.Set("st_nlink",Napi::Number::New(*env,stat->st_nlink));
+    obj.Set("st_uid",Napi::Number::New(*env,stat->st_uid));
+    obj.Set("st_gid",Napi::Number::New(*env,stat->st_gid));
+    obj.Set("st_rdev",Napi::Number::New(*env,stat->st_rdev));
+    obj.Set("st_size",Napi::Number::New(*env,stat->st_size));
+    obj.Set("st_blksize",Napi::Number::New(*env,stat->st_blksize));
+    obj.Set("st_blocks",Napi::Number::New(*env,stat->st_blocks));
+    obj.Set("st_atime",Napi::Number::New(*env,stat->st_atime));
+    obj.Set("st_mtime",Napi::Number::New(*env,stat->st_mtime));
+    obj.Set("st_ctime",Napi::Number::New(*env,stat->st_ctime));
+
+    return obj;
+}
+
 Napi::Object node_stat(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
-    std::string path = info[0].As<Napi::String>().Utf8Value();
+    const char* path = info[0].As<Napi::String>().Utf8Value().c_str();
 
     struct stat* buf;
-    stat(path.c_str(),buf);
-    
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set("st_dev",Napi::Number::New(env,buf->st_dev));
-    obj.Set("st_ino",Napi::Number::New(env,buf->st_ino));
-    obj.Set("st_mode",Napi::Number::New(env,buf->st_mode));
-    obj.Set("st_nlink",Napi::Number::New(env,buf->st_nlink));
-    obj.Set("st_uid",Napi::Number::New(env,buf->st_uid));
-    obj.Set("st_gid",Napi::Number::New(env,buf->st_gid));
-    obj.Set("st_rdev",Napi::Number::New(env,buf->st_rdev));
-    obj.Set("st_size",Napi::Number::New(env,buf->st_size));
-    obj.Set("st_blksize",Napi::Number::New(env,buf->st_blksize));
-    obj.Set("st_blocks",Napi::Number::New(env,buf->st_blocks));
-    obj.Set("st_atime",Napi::Number::New(env,buf->st_atime));
-    obj.Set("st_mtime",Napi::Number::New(env,buf->st_mtime));
-    obj.Set("st_ctime",Napi::Number::New(env,buf->st_ctime));
+    stat(path,buf);
 
-    return  obj;
+    return  statToStatObj(buf,&env);
 }
 
 
 Napi::Object node_lstat(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
-    std::string path = info[0].As<Napi::String>().Utf8Value();
+    const char* path = info[0].As<Napi::String>().Utf8Value().c_str();
 
     struct stat* buf;
-    lstat(path.c_str(),buf);
-    
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set("st_dev",Napi::Number::New(env,buf->st_dev));
-    obj.Set("st_ino",Napi::Number::New(env,buf->st_ino));
-    obj.Set("st_mode",Napi::Number::New(env,buf->st_mode));
-    obj.Set("st_nlink",Napi::Number::New(env,buf->st_nlink));
-    obj.Set("st_uid",Napi::Number::New(env,buf->st_uid));
-    obj.Set("st_gid",Napi::Number::New(env,buf->st_gid));
-    obj.Set("st_rdev",Napi::Number::New(env,buf->st_rdev));
-    obj.Set("st_size",Napi::Number::New(env,buf->st_size));
-    obj.Set("st_blksize",Napi::Number::New(env,buf->st_blksize));
-    obj.Set("st_blocks",Napi::Number::New(env,buf->st_blocks));
-    obj.Set("st_atime",Napi::Number::New(env,buf->st_atime));
-    obj.Set("st_mtime",Napi::Number::New(env,buf->st_mtime));
-    obj.Set("st_ctime",Napi::Number::New(env,buf->st_ctime));
-
-    return  obj;
+    lstat(path,buf);
+    return  statToStatObj(buf,&env);
 }
 
 Napi::Object node_fstat(const Napi::CallbackInfo& info)
@@ -136,22 +125,7 @@ Napi::Object node_fstat(const Napi::CallbackInfo& info)
     struct stat* buf;
     fstat(fd,buf);
     
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set("st_dev",Napi::Number::New(env,buf->st_dev));
-    obj.Set("st_ino",Napi::Number::New(env,buf->st_ino));
-    obj.Set("st_mode",Napi::Number::New(env,buf->st_mode));
-    obj.Set("st_nlink",Napi::Number::New(env,buf->st_nlink));
-    obj.Set("st_uid",Napi::Number::New(env,buf->st_uid));
-    obj.Set("st_gid",Napi::Number::New(env,buf->st_gid));
-    obj.Set("st_rdev",Napi::Number::New(env,buf->st_rdev));
-    obj.Set("st_size",Napi::Number::New(env,buf->st_size));
-    obj.Set("st_blksize",Napi::Number::New(env,buf->st_blksize));
-    obj.Set("st_blocks",Napi::Number::New(env,buf->st_blocks));
-    obj.Set("st_atime",Napi::Number::New(env,buf->st_atime));
-    obj.Set("st_mtime",Napi::Number::New(env,buf->st_mtime));
-    obj.Set("st_ctime",Napi::Number::New(env,buf->st_ctime));
-
-    return  obj;
+    return  statToStatObj(buf,&env);
 }
 
 Napi::Number node_poll(const Napi::CallbackInfo& info){
