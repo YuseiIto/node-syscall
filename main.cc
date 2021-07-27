@@ -241,6 +241,13 @@ Napi::Number node_chdir(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,chdir(path));
 }
 
+Napi::Number node_fchdir(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int fd=info[0].As<Napi::Number>().Uint32Value();
+    return  Napi::Number::New(env,fchdir(fd));
+}
+
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -276,7 +283,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_bind));
     exports.Set(Napi::String::New(env, "chdir"), 
           Napi::Function::New(env, node_chdir));
-
+    exports.Set(Napi::String::New(env, "fchdir"), 
+          Napi::Function::New(env, node_fchdir));
     return exports;
 }
 
