@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -187,6 +188,16 @@ void node_exit(const Napi::CallbackInfo& info){
     exit(exit_code); 
 }
 
+Napi::Number node_socket(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int domain=info[0].As<Napi::Number>().Uint32Value();
+    int type=info[1].As<Napi::Number>().Uint32Value();
+    int protocol=info[2].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,socket(domain,type,protocol));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -213,6 +224,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_brk));
     exports.Set(Napi::String::New(env, "exit"), 
           Napi::Function::New(env, node_exit));
+    exports.Set(Napi::String::New(env, "socket"), 
+          Napi::Function::New(env, node_socket));
+          
     return exports;
 }
 
