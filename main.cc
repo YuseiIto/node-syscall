@@ -179,6 +179,14 @@ Napi::Number node_brk(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,brk(end_data_segment));
 }
 
+void node_exit(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int exit_code=info[0].As<Napi::Number>().Uint32Value();
+    
+    exit(exit_code); 
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -203,7 +211,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_lseek));
     exports.Set(Napi::String::New(env, "brk"), 
           Napi::Function::New(env, node_brk));
-    
+    exports.Set(Napi::String::New(env, "exit"), 
+          Napi::Function::New(env, node_exit));
     return exports;
 }
 
