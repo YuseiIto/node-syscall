@@ -198,6 +198,41 @@ Napi::Number node_socket(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,socket(domain,type,protocol));
 }
 
+Napi::Object node_accept(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int socketfd=info[0].As<Napi::Number>().Uint32Value();
+    struct sockaddr addr;
+    socklen_t addlen;
+
+    accept(socketfd,&addr,&addlen);
+    
+    Napi::Object obj = Napi::Object::New(env);
+    obj.Set("sa_family",Napi::Number::New(env,addr.sa_family));
+    obj.Set("sa_data",Napi::Buffer<char>::Copy(env,addr.sa_data,14));
+
+    return  obj;
+}
+
+Napi::Number node_bind(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int sock=info[0].As<Napi::Number>().Uint32Value();
+
+    Napi::Object addr_obj = info[1].As<Napi::Object>();
+    struct sockaddr addr;
+
+    for (int i=0;i<14;i++){
+        addr.sa_data[i]=addr_obj.Get("sa_data").As<Napi::Object>().Get(i).As<Napi::Number>().Uint32Value();
+    }
+    
+    addr.sa_family=addr_obj.Get("sa_family").As<Napi::Number>().Uint32Value();
+
+    socklen_t addrlen =info[2].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,bind(sock,&addr,addrlen));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -226,7 +261,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_exit));
     exports.Set(Napi::String::New(env, "socket"), 
           Napi::Function::New(env, node_socket));
-          
+    exports.Set(Napi::String::New(env, "accept"), 
+          Napi::Function::New(env, node_accept));
     return exports;
 }
 
