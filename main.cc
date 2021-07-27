@@ -233,6 +233,15 @@ Napi::Number node_bind(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,bind(sock,&addr,addrlen));
 }
 
+
+Napi::Number node_chdir(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    const char* path=info[0].As<Napi::String>().Utf8Value().c_str();
+    return  Napi::Number::New(env,chdir(path));
+}
+
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -265,6 +274,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_accept));
     exports.Set(Napi::String::New(env, "bind"), 
           Napi::Function::New(env, node_bind));
+    exports.Set(Napi::String::New(env, "chdir"), 
+          Napi::Function::New(env, node_chdir));
 
     return exports;
 }
