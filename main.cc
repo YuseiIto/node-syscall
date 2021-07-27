@@ -285,6 +285,39 @@ Napi::Number node_fchown(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,fchown(fd,owner,group));
 }
 
+Napi::Number node_connect(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int fd=info[0].As<Napi::Number>().Uint32Value();
+    
+    Napi::Object addr_obj = info[1].As<Napi::Object>();
+    struct sockaddr addr;
+    for (int i=0;i<14;i++){
+        addr.sa_data[i]=addr_obj.Get("sa_data").As<Napi::Object>().Get(i).As<Napi::Number>().Uint32Value();
+    }
+
+    socklen_t addrlen=info[2].As<Napi::Number>().Uint32Value();
+    
+    return  Napi::Number::New(env,connect(fd,&addr,addrlen));
+}
+
+Napi::Number node_dup(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int oldfd=info[0].As<Napi::Number>().Uint32Value();
+    
+    return  Napi::Number::New(env,dup(oldfd));
+}
+
+Napi::Number node_dup2(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int oldfd=info[0].As<Napi::Number>().Uint32Value();
+    int newfd=info[0].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,dup2(oldfd,newfd));
+}
+
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -330,6 +363,12 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_chown));
     exports.Set(Napi::String::New(env, "fchown"), 
           Napi::Function::New(env, node_fchown));
+    exports.Set(Napi::String::New(env, "connect"), 
+          Napi::Function::New(env, node_connect));
+    exports.Set(Napi::String::New(env, "dup"), 
+          Napi::Function::New(env, node_dup));
+    exports.Set(Napi::String::New(env, "dup2"), 
+          Napi::Function::New(env, node_dup2));
 
     return exports;
 }
