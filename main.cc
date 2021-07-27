@@ -401,6 +401,14 @@ Napi::Number node_listen(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,listen(socketfd,backlog));
 }
 
+Napi::Number node_mkdir(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* pathname=info[0].As<Napi::String>().Utf8Value().c_str();
+    mode_t mode=info[1].As<Napi::Number>().Uint32Value();
+
+    return Napi::Number::New(env,mkdir(pathname,mode));
+}
+
 Napi::Number node_link(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -474,6 +482,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_link));
     exports.Set(Napi::String::New(env, "listen"), 
           Napi::Function::New(env, node_listen));
+    exports.Set(Napi::String::New(env, "mkdir"), 
+          Napi::Function::New(env, node_mkdir));
 
     return exports;
 }
