@@ -456,6 +456,17 @@ Napi::Number node_rename(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,rename(oldpath,newpath));
 }
 
+Napi::Number node_rmdir(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* pathname = info[0].As<Napi::String>().Utf8Value().c_str();
+
+    return Napi::Number::New(env,rmdir(pathname));
+}
+
+Napi::Number node_setsid(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    return Napi::Number::New(env,setsid());
+}
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -529,7 +540,11 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_readlink));
     exports.Set(Napi::String::New(env, "rename"), 
           Napi::Function::New(env, node_rename));
-
+    exports.Set(Napi::String::New(env, "rmdir"), 
+          Napi::Function::New(env, node_rmdir));
+    exports.Set(Napi::String::New(env, "setsid"), 
+          Napi::Function::New(env, node_setsid));
+          
     return exports;
 }
 
