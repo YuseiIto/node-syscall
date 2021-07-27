@@ -434,6 +434,21 @@ Napi::Value node_pipe(const Napi::CallbackInfo& info)
     return obj;
 }
 
+Napi::Value node_readlink(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+    const char* path = info[0].As<Napi::String>().Utf8Value().c_str();
+    size_t bufsiz=info[1].As<Napi::Number>().Uint32Value();
+
+    char* buf;
+
+    ssize_t res=readlink(path,buf,bufsiz);
+    if (res==-1) return Napi::Number::New(env,errno);
+
+    return Napi::Buffer<char>::Copy(env,buf,res);
+}
+
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -502,7 +517,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_mkdir));
     exports.Set(Napi::String::New(env, "pipe"), 
           Napi::Function::New(env, node_pipe));
-    
+    exports.Set(Napi::String::New(env, "readlink"), 
+          Napi::Function::New(env, node_readlink));
     return exports;
 }
 
