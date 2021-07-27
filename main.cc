@@ -263,6 +263,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_socket));
     exports.Set(Napi::String::New(env, "accept"), 
           Napi::Function::New(env, node_accept));
+    exports.Set(Napi::String::New(env, "bind"), 
+          Napi::Function::New(env, node_bind));
+
     return exports;
 }
 
