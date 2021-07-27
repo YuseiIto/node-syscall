@@ -248,6 +248,23 @@ Napi::Number node_fchdir(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,fchdir(fd));
 }
 
+Napi::Number node_chmod(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    const char* path=info[0].As<Napi::String>().Utf8Value().c_str();
+    int mode=info[1].As<Napi::Number>().Uint32Value();
+    return  Napi::Number::New(env,chmod(path,mode));
+}
+
+Napi::Number node_fchmod(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int fd=info[0].As<Napi::Number>().Uint32Value();
+    int mode=info[1].As<Napi::Number>().Uint32Value();
+    
+    return  Napi::Number::New(env,fchmod(fd,mod));
+}
+
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -285,6 +302,11 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_chdir));
     exports.Set(Napi::String::New(env, "fchdir"), 
           Napi::Function::New(env, node_fchdir));
+    exports.Set(Napi::String::New(env, "chmod"), 
+          Napi::Function::New(env, node_chmod));
+    exports.Set(Napi::String::New(env, "fchmod"), 
+          Napi::Function::New(env, node_fchmod));
+
     return exports;
 }
 
