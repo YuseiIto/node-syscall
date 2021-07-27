@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <utime.h>
+#include <sys/wait.h>
 
 namespace node_syscall {
 
@@ -502,6 +503,19 @@ Napi::Number node_utime(const Napi::CallbackInfo& info){
     ut.modtime=arg.Get("modtime").As<Napi::Number>().Uint32Value();
 
     return Napi::Number::New(env,utime(filename,&ut));
+}
+
+Napi::Object node_wait(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+
+    int status;
+    pid_t pid = wait(&status);
+
+    Napi::Object ret= Napi::Object::New(env);
+    ret.Set("status",Napi::Number::New(env,status));
+    ret.Set("pid",Napi::Number::New(env,pid));
+
+    return ret;
 }
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
