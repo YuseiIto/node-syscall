@@ -418,6 +418,22 @@ Napi::Number node_link(const Napi::CallbackInfo& info)
     return Napi::Number::New(env,link(oldpath,newpath));
 }
 
+Napi::Value node_pipe(const Napi::CallbackInfo& info)
+{
+    Napi::Env env = info.Env();
+
+    int filedes[2];
+    int res=pipe(filedes);
+
+    if (res!=0) return Napi::Number::New(env,res);
+
+    Napi::Array obj =Napi::Array::New(env);
+    obj.Set(Napi::Number::New(env,0),Napi::Number::New(env,filedes[0]));
+    obj.Set(Napi::Number::New(env,1),Napi::Number::New(env,filedes[1]));
+
+    return obj;
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -484,7 +500,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_listen));
     exports.Set(Napi::String::New(env, "mkdir"), 
           Napi::Function::New(env, node_mkdir));
-
+    exports.Set(Napi::String::New(env, "pipe"), 
+          Napi::Function::New(env, node_pipe));
+    
     return exports;
 }
 
