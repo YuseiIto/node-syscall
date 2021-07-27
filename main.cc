@@ -393,6 +393,14 @@ Napi::Number node_kill(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,kill(pid,sig));
 }
 
+Napi::Number node_listen(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    int socketfd=info[0].As<Napi::Number>().Uint32Value();
+    int backlog=info[1].As<Napi::Number>().Uint32Value();
+
+    return Napi::Number::New(env,listen(socketfd,backlog));
+}
+
 Napi::Number node_link(const Napi::CallbackInfo& info)
 {
     Napi::Env env = info.Env();
@@ -464,6 +472,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_kill));
     exports.Set(Napi::String::New(env, "link"), 
           Napi::Function::New(env, node_link));
+    exports.Set(Napi::String::New(env, "listen"), 
+          Napi::Function::New(env, node_listen));
 
     return exports;
 }
