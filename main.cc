@@ -384,6 +384,32 @@ Napi::Value node_getrusage(const Napi::CallbackInfo& info){
     return  rusage_obj;
 }
 
+
+Napi::Object timezoneToTimezoneObj(struct timezone *tz,Napi::Env* env){
+    Napi::Object tz_obj = Napi::Object::New(*env);
+    tz_obj.Set("tz_minuteswest",Napi::Number::New(*env,tz->tz_minuteswest));
+    tz_obj.Set("tz_dsttime",Napi::Number::New(*env,tz->tz_dsttime));   
+    return tz_obj;
+}
+
+Napi::Value node_gettimeofday(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+
+    struct timeval tv;
+    struct timezone tz;
+
+    int res=gettimeofday(&tv,&tz);
+
+    if (res!=0) return Napi::Number::New(env,res);
+
+    Napi::Object ret= Napi::Object::New(env);
+    ret.Set("tv",timevalToTimeObj(&tv,&env));
+    ret.Set("tz",timezoneToTimezoneObj(&tz,&env));
+
+    return ret;
+}
+
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -440,6 +466,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_fork));
     exports.Set(Napi::String::New(env, "getrusage"), 
           Napi::Function::New(env, node_getrusage));
+    exports.Set(Napi::String::New(env, "gettimeofday"), 
+          Napi::Function::New(env, node_gettimeofday));
     return exports;
 }
 
