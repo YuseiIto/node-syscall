@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <fcntl.h>
+#include <signal.h>
 
 namespace node_syscall {
 
@@ -410,6 +411,14 @@ Napi::Value node_gettimeofday(const Napi::CallbackInfo& info){
 }
 
 
+Napi::Number node_kill(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    int pid=info[0].As<Napi::Number>().Uint32Value();
+    int sig=info[1].As<Napi::Number>().Uint32Value();
+
+    return Napi::Number::New(env,kill(pid,sig));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -468,6 +477,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_getrusage));
     exports.Set(Napi::String::New(env, "gettimeofday"), 
           Napi::Function::New(env, node_gettimeofday));
+    exports.Set(Napi::String::New(env, "kill"), 
+          Napi::Function::New(env, node_kill));
+
     return exports;
 }
 
