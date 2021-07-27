@@ -10,6 +10,7 @@
 #include <poll.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <utime.h>
 
 namespace node_syscall {
 
@@ -489,6 +490,20 @@ Napi::Number node_unlink(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,unlink(pathname));
 }
 
+
+Napi::Number node_utime(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* filename = info[0].As<Napi::String>().Utf8Value().c_str();
+
+    Napi::Object arg=info[1].As<Napi::Object>();
+    
+    struct utimbuf  ut;
+    ut.actime=arg.Get("actime").As<Napi::Number>().Uint32Value();
+    ut.modtime=arg.Get("modtime").As<Napi::Number>().Uint32Value();
+
+    return Napi::Number::New(env,utime(filename,&ut));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -571,7 +586,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_time));
     exports.Set(Napi::String::New(env, "unlink"), 
           Napi::Function::New(env, node_unlink));
-          
+        exports.Set(Napi::String::New(env, "utime"), 
+          Napi::Function::New(env, node_utime));
+
     return exports;
 }
 
