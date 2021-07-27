@@ -477,6 +477,11 @@ Napi::Number node_symlink(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,symlink(oldpath,newpath));
 }
 
+Napi::Number node_time(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    return Napi::Number::New(env,time(nullptr));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -555,6 +560,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_setsid));
     exports.Set(Napi::String::New(env, "symlink"), 
           Napi::Function::New(env, node_symlink));
+    exports.Set(Napi::String::New(env, "time"), 
+          Napi::Function::New(env, node_time));
 
     return exports;
 }
