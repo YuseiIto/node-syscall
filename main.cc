@@ -2,6 +2,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
@@ -342,6 +344,46 @@ Napi::Number node_fork(const Napi::CallbackInfo& info){
     return  Napi::Number::New(env,fork());
 }
 
+Napi::Object timevalToTimeObj(struct timeval* timeval,Napi::Env* env){
+    Napi::Object res = Napi::Object::New(*env);
+    res.Set("tv_sec",Napi::Number::New(*env,timeval->tv_sec));
+    res.Set("tv_usec",Napi::Number::New(*env,timeval->tv_usec));
+
+    return res;
+}
+
+Napi::Value node_getrusage(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int who=info[0].As<Napi::Number>().Uint32Value();
+
+    struct rusage rusage;
+    int res = getrusage(who,&rusage );
+
+    if (res!=0) return Napi::Number::New(env,res);
+
+    Napi::Object rusage_obj = Napi::Object::New(env);
+
+    rusage_obj.Set("ru_utime",timevalToTimeObj(&rusage.ru_utime,&env));
+    rusage_obj.Set("ru_stime",timevalToTimeObj(&rusage.ru_stime,&env));
+    rusage_obj.Set("ru_maxrss",Napi::Number::New(env,rusage.ru_maxrss));
+    rusage_obj.Set("ru_ixrss",Napi::Number::New(env,rusage.ru_ixrss));
+    rusage_obj.Set("ru_idrss",Napi::Number::New(env,rusage.ru_idrss));
+    rusage_obj.Set("ru_isrss",Napi::Number::New(env,rusage.ru_isrss));
+    rusage_obj.Set("ru_minflt",Napi::Number::New(env,rusage.ru_minflt));
+    rusage_obj.Set("ru_majflt",Napi::Number::New(env,rusage.ru_majflt));
+    rusage_obj.Set("ru_nswap",Napi::Number::New(env,rusage.ru_nswap));
+    rusage_obj.Set("ru_inblock",Napi::Number::New(env,rusage.ru_inblock));
+    rusage_obj.Set("ru_oublock",Napi::Number::New(env,rusage.ru_oublock));
+    rusage_obj.Set("ru_msgsnd",Napi::Number::New(env,rusage.ru_msgsnd));
+    rusage_obj.Set("ru_msgrcv",Napi::Number::New(env,rusage.ru_msgrcv));
+    rusage_obj.Set("ru_nsignals",Napi::Number::New(env,rusage.ru_nsignals));
+    rusage_obj.Set("ru_nvcsw",Napi::Number::New(env,rusage.ru_nvcsw));
+    rusage_obj.Set("ru_nivcsw",Napi::Number::New(env,rusage.ru_nivcsw));
+
+    return  rusage_obj;
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -396,6 +438,8 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_dup2));
     exports.Set(Napi::String::New(env, "fork"), 
           Napi::Function::New(env, node_fork));
+    exports.Set(Napi::String::New(env, "getrusage"), 
+          Napi::Function::New(env, node_getrusage));
     return exports;
 }
 
