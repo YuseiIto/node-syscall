@@ -448,6 +448,14 @@ Napi::Value node_readlink(const Napi::CallbackInfo& info)
     return Napi::Buffer<char>::Copy(env,buf,res);
 }
 
+Napi::Number node_rename(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* oldpath = info[0].As<Napi::String>().Utf8Value().c_str();
+    const char* newpath = info[1].As<Napi::String>().Utf8Value().c_str();
+
+    return Napi::Number::New(env,rename(oldpath,newpath));
+}
+
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
@@ -519,6 +527,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_pipe));
     exports.Set(Napi::String::New(env, "readlink"), 
           Napi::Function::New(env, node_readlink));
+    exports.Set(Napi::String::New(env, "rename"), 
+          Napi::Function::New(env, node_rename));
+
     return exports;
 }
 
