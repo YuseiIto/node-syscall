@@ -262,7 +262,27 @@ Napi::Number node_fchmod(const Napi::CallbackInfo& info){
     int fd=info[0].As<Napi::Number>().Uint32Value();
     int mode=info[1].As<Napi::Number>().Uint32Value();
     
-    return  Napi::Number::New(env,fchmod(fd,mod));
+    return  Napi::Number::New(env,fchmod(fd,mode));
+}
+
+Napi::Number node_chown(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    const char* path=info[0].As<Napi::String>().Utf8Value().c_str();
+    int owner=info[1].As<Napi::Number>().Uint32Value();
+    int group=info[2].As<Napi::Number>().Uint32Value();
+
+    return  Napi::Number::New(env,chown(path,owner,group));
+}
+
+Napi::Number node_fchown(const Napi::CallbackInfo& info){
+
+    Napi::Env env = info.Env();
+    int fd=info[0].As<Napi::Number>().Uint32Value();
+    int owner=info[1].As<Napi::Number>().Uint32Value();
+    int group=info[2].As<Napi::Number>().Uint32Value();
+    
+    return  Napi::Number::New(env,fchown(fd,owner,group));
 }
 
 
@@ -306,6 +326,10 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_chmod));
     exports.Set(Napi::String::New(env, "fchmod"), 
           Napi::Function::New(env, node_fchmod));
+    exports.Set(Napi::String::New(env, "chown"), 
+          Napi::Function::New(env, node_chown));
+    exports.Set(Napi::String::New(env, "fchown"), 
+          Napi::Function::New(env, node_fchown));
 
     return exports;
 }
