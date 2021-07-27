@@ -482,6 +482,13 @@ Napi::Number node_time(const Napi::CallbackInfo& info){
     return Napi::Number::New(env,time(nullptr));
 }
 
+Napi::Number node_unlink(const Napi::CallbackInfo& info){
+    Napi::Env env = info.Env();
+    const char* pathname = info[0].As<Napi::String>().Utf8Value().c_str();
+
+    return Napi::Number::New(env,unlink(pathname));
+}
+
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
     exports.Set(Napi::String::New(env, "getpid"), 
@@ -562,7 +569,9 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_symlink));
     exports.Set(Napi::String::New(env, "time"), 
           Napi::Function::New(env, node_time));
-
+    exports.Set(Napi::String::New(env, "unlink"), 
+          Napi::Function::New(env, node_unlink));
+          
     return exports;
 }
 
