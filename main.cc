@@ -520,10 +520,19 @@ Napi::Object node_wait(const Napi::CallbackInfo& info){
 
 Napi::Object Initialize(Napi::Env env, Napi::Object exports)
 {
-    exports.Set(Napi::String::New(env, "getpid"), 
-                Napi::Function::New(env, node_getpid));
-    exports.Set(Napi::String::New(env, "getppid"), 
-                Napi::Function::New(env, node_getppid));
+
+
+    // symlinks
+    exports.Set(Napi::String::New(env, "link"), 
+          Napi::Function::New(env, node_link));
+    exports.Set(Napi::String::New(env, "symlink"), 
+          Napi::Function::New(env, node_symlink));
+    exports.Set(Napi::String::New(env, "readlink"), 
+          Napi::Function::New(env, node_readlink));
+    exports.Set(Napi::String::New(env, "unlink"), 
+          Napi::Function::New(env, node_unlink));
+
+    // File operation
     exports.Set(Napi::String::New(env, "read"), 
                 Napi::Function::New(env, node_read));
     exports.Set(Napi::String::New(env, "write"), 
@@ -532,30 +541,18 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
                 Napi::Function::New(env, node_open));
     exports.Set(Napi::String::New(env, "close"), 
           Napi::Function::New(env, node_close));
-    exports.Set(Napi::String::New(env, "stat"), 
-          Napi::Function::New(env, node_stat));
-    exports.Set(Napi::String::New(env, "lstat"), 
-          Napi::Function::New(env, node_lstat));
-    exports.Set(Napi::String::New(env, "fstat"), 
-          Napi::Function::New(env, node_fstat));
-    exports.Set(Napi::String::New(env, "poll"), 
-          Napi::Function::New(env, node_poll));
     exports.Set(Napi::String::New(env, "lseek"), 
           Napi::Function::New(env, node_lseek));
-    exports.Set(Napi::String::New(env, "brk"), 
-          Napi::Function::New(env, node_brk));
-    exports.Set(Napi::String::New(env, "exit"), 
-          Napi::Function::New(env, node_exit));
-    exports.Set(Napi::String::New(env, "socket"), 
-          Napi::Function::New(env, node_socket));
-    exports.Set(Napi::String::New(env, "accept"), 
-          Napi::Function::New(env, node_accept));
-    exports.Set(Napi::String::New(env, "bind"), 
-          Napi::Function::New(env, node_bind));
     exports.Set(Napi::String::New(env, "chdir"), 
           Napi::Function::New(env, node_chdir));
     exports.Set(Napi::String::New(env, "fchdir"), 
           Napi::Function::New(env, node_fchdir));
+    exports.Set(Napi::String::New(env, "mkdir"), 
+          Napi::Function::New(env, node_mkdir));
+    exports.Set(Napi::String::New(env, "rename"), 
+          Napi::Function::New(env, node_rename));
+    exports.Set(Napi::String::New(env, "rmdir"), 
+          Napi::Function::New(env, node_rmdir));
     exports.Set(Napi::String::New(env, "chmod"), 
           Napi::Function::New(env, node_chmod));
     exports.Set(Napi::String::New(env, "fchmod"), 
@@ -564,44 +561,71 @@ Napi::Object Initialize(Napi::Env env, Napi::Object exports)
           Napi::Function::New(env, node_chown));
     exports.Set(Napi::String::New(env, "fchown"), 
           Napi::Function::New(env, node_fchown));
-    exports.Set(Napi::String::New(env, "connect"), 
-          Napi::Function::New(env, node_connect));
     exports.Set(Napi::String::New(env, "dup"), 
           Napi::Function::New(env, node_dup));
     exports.Set(Napi::String::New(env, "dup2"), 
           Napi::Function::New(env, node_dup2));
-    exports.Set(Napi::String::New(env, "fork"), 
-          Napi::Function::New(env, node_fork));
-    exports.Set(Napi::String::New(env, "getrusage"), 
-          Napi::Function::New(env, node_getrusage));
+    exports.Set(Napi::String::New(env, "poll"), 
+          Napi::Function::New(env, node_poll));
+
+    // stat
+    exports.Set(Napi::String::New(env, "stat"), 
+          Napi::Function::New(env, node_stat));
+    exports.Set(Napi::String::New(env, "lstat"), 
+          Napi::Function::New(env, node_lstat));
+    exports.Set(Napi::String::New(env, "fstat"), 
+          Napi::Function::New(env, node_fstat));
+
+    // time of day
     exports.Set(Napi::String::New(env, "gettimeofday"), 
           Napi::Function::New(env, node_gettimeofday));
-    exports.Set(Napi::String::New(env, "kill"), 
-          Napi::Function::New(env, node_kill));
-    exports.Set(Napi::String::New(env, "link"), 
-          Napi::Function::New(env, node_link));
-    exports.Set(Napi::String::New(env, "listen"), 
-          Napi::Function::New(env, node_listen));
-    exports.Set(Napi::String::New(env, "mkdir"), 
-          Napi::Function::New(env, node_mkdir));
-    exports.Set(Napi::String::New(env, "pipe"), 
-          Napi::Function::New(env, node_pipe));
-    exports.Set(Napi::String::New(env, "readlink"), 
-          Napi::Function::New(env, node_readlink));
-    exports.Set(Napi::String::New(env, "rename"), 
-          Napi::Function::New(env, node_rename));
-    exports.Set(Napi::String::New(env, "rmdir"), 
-          Napi::Function::New(env, node_rmdir));
-    exports.Set(Napi::String::New(env, "setsid"), 
-          Napi::Function::New(env, node_setsid));
-    exports.Set(Napi::String::New(env, "symlink"), 
-          Napi::Function::New(env, node_symlink));
     exports.Set(Napi::String::New(env, "time"), 
           Napi::Function::New(env, node_time));
-    exports.Set(Napi::String::New(env, "unlink"), 
-          Napi::Function::New(env, node_unlink));
-        exports.Set(Napi::String::New(env, "utime"), 
+    exports.Set(Napi::String::New(env, "utime"), 
           Napi::Function::New(env, node_utime));
+
+    // Memory operation
+    exports.Set(Napi::String::New(env, "brk"), 
+          Napi::Function::New(env, node_brk));
+
+
+    // Process
+    exports.Set(Napi::String::New(env, "fork"), 
+          Napi::Function::New(env, node_fork));
+    exports.Set(Napi::String::New(env, "kill"), 
+          Napi::Function::New(env, node_kill));
+    exports.Set(Napi::String::New(env, "exit"), 
+          Napi::Function::New(env, node_exit));
+    exports.Set(Napi::String::New(env, "setsid"), 
+          Napi::Function::New(env, node_setsid));
+    exports.Set(Napi::String::New(env, "getpid"), 
+                Napi::Function::New(env, node_getpid));
+    exports.Set(Napi::String::New(env, "getppid"), 
+                Napi::Function::New(env, node_getppid));
+
+    // Socket
+    exports.Set(Napi::String::New(env, "socket"), 
+          Napi::Function::New(env, node_socket));
+    exports.Set(Napi::String::New(env, "accept"), 
+          Napi::Function::New(env, node_accept));
+    exports.Set(Napi::String::New(env, "bind"), 
+          Napi::Function::New(env, node_bind));
+    exports.Set(Napi::String::New(env, "listen"), 
+          Napi::Function::New(env, node_listen));
+    exports.Set(Napi::String::New(env, "connect"), 
+          Napi::Function::New(env, node_connect));
+
+    
+
+
+
+    // Pipe
+    exports.Set(Napi::String::New(env, "pipe"), 
+          Napi::Function::New(env, node_pipe));
+    exports.Set(Napi::String::New(env, "getrusage"), 
+          Napi::Function::New(env, node_getrusage));
+
+
 
     return exports;
 }
